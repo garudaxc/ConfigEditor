@@ -56,6 +56,8 @@ namespace ConfigEditor
             RefreshTreeView();
 
             dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill ;
+            
+            Assembly assembly = Assembly.LoadFrom(@"D:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll");                    
 
         }
 
@@ -247,10 +249,12 @@ namespace ConfigEditor
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 string fName = openFileDialog.FileName;
-                AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += this.ResolveAssembly;
+                // 预加载程序集？
+                //AppDomain.CurrentDomain.AssemblyResolve
+                //AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += this.ResolveAssembly;
                 try
                 {
-                    Assembly assembly = Assembly.ReflectionOnlyLoadFrom(fName);
+                    Assembly assembly = Assembly.LoadFrom(fName);
                     foreach (Type type in assembly.GetExportedTypes())
                     {
                         Log.Append(type.FullName);
@@ -263,7 +267,7 @@ namespace ConfigEditor
                 }
                 finally
                 {
-                    AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.ResolveAssembly;
+                    //AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.ResolveAssembly;
                 }
 
             }
