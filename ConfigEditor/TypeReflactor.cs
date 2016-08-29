@@ -132,11 +132,11 @@ namespace ConfigEditor
             type_ = t;
             info_ = info;
 
-            if (info_ != null)
-            {
-                Log.Append("field {0} is {1}a value type", info_.Name, type_.IsValueType ? "" : "not ");
-                Log.Append("field {0} is {1}a array", info_.Name, type_.IsArray ? "" : "not ");
-            }
+            //if (info_ != null)
+            //{
+            //    Log.Append("field {0} is {1}a value type", info_.Name, type_.IsValueType ? "" : "not ");
+            //    Log.Append("field {0} is {1}a array", info_.Name, type_.IsArray ? "" : "not ");
+            //}
 
             if(type_.IsValueType)
             {

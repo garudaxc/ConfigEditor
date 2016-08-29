@@ -31,6 +31,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.treeView = new System.Windows.Forms.TreeView();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -40,7 +41,8 @@
             this.btnEdit = new System.Windows.Forms.Button();
             this.lableInfo = new System.Windows.Forms.Label();
             this.console = new System.Windows.Forms.RichTextBox();
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemLoadAssembly = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemLoadInstance = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -68,7 +70,9 @@
             // 
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newToolStripMenuItem,
-            this.saveToolStripMenuItem});
+            this.saveToolStripMenuItem,
+            this.MenuItemLoadAssembly,
+            this.MenuItemLoadInstance});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(39, 21);
             this.toolStripMenuItem1.Text = "File";
@@ -79,6 +83,13 @@
             this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.newToolStripMenuItem.Text = "New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // treeView
             // 
@@ -145,6 +156,7 @@
             // dataGrid
             // 
             this.dataGrid.AllowUserToResizeRows = false;
+            this.dataGrid.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGrid.Location = new System.Drawing.Point(0, 0);
@@ -194,12 +206,19 @@
             this.console.TabIndex = 0;
             this.console.Text = "";
             // 
-            // saveToolStripMenuItem
+            // MenuItemLoadAssembly
             // 
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.saveToolStripMenuItem.Text = "Save";
-            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            this.MenuItemLoadAssembly.Name = "MenuItemLoadAssembly";
+            this.MenuItemLoadAssembly.Size = new System.Drawing.Size(152, 22);
+            this.MenuItemLoadAssembly.Text = "加载程序集";
+            this.MenuItemLoadAssembly.Click += new System.EventHandler(this.MenuItemLoadAssembly_Click);
+            // 
+            // MenuItemLoadInstance
+            // 
+            this.MenuItemLoadInstance.Name = "MenuItemLoadInstance";
+            this.MenuItemLoadInstance.Size = new System.Drawing.Size(152, 22);
+            this.MenuItemLoadInstance.Text = "加载实例数据";
+            this.MenuItemLoadInstance.Click += new System.EventHandler(this.MenuItemLoadInstance_Click);
             // 
             // MainForm
             // 
@@ -245,6 +264,8 @@
         private System.Windows.Forms.Button btnEdit;
         private System.Windows.Forms.Button btnAddElem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemLoadAssembly;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemLoadInstance;
     }
 }
 

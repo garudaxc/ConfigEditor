@@ -54,6 +54,9 @@ namespace ConfigEditor
             reflactor_ = new TypeReflactor(typeof(Gift));
 
             RefreshTreeView();
+
+            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill ;
+
         }
 
 
@@ -109,12 +112,13 @@ namespace ConfigEditor
                     row.Cells.Add(cell);
                     cell.Value = node.Value == null ? "null" : node.Value;
                     cell.Tag = node;
-                    if(!node.Type.IsValueType && node.Type.Equals(typeof(string)))
+                    if(!node.Type.IsValueType && !node.Type.Equals(typeof(string)))
                     {
                         cell.ReadOnly = true;
                     }
 
                     dataGrid.Rows.Add(row);
+
                 }
             }
 
@@ -216,14 +220,60 @@ namespace ConfigEditor
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            reflactor_.Root.SerializeFrom(@"d:\test.xml");
-            reflactor_.Root.DispatchInstanceValue();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             reflactor_.Root.CollectInstanceValue();
             reflactor_.Root.SerializeTo(@"d:\test.xml");
+        }
+
+        private Assembly ResolveAssembly(object sender, ResolveEventArgs e)
+        {
+            Log.Append("resolve {0}", e.Name);
+            Assembly ass = Assembly.ReflectionOnlyLoad(e.Name);
+            return ass;
+        }
+
+        private void MenuItemLoadAssembly_Click(object sender, EventArgs e)
+        {
+            
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            //openFileDialog.InitialDirectory = "c:\\";//注意这里写路径时要用c:\\而不是c:\
+            openFileDialog.Filter = "程序集|*.dll;*.exe|所有文件|*.*";
+            openFileDialog.RestoreDirectory = true;
+            openFileDialog.Multiselect = false;
+            openFileDialog.FilterIndex = 1;
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fName = openFileDialog.FileName;
+                AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += this.ResolveAssembly;
+                try
+                {
+                    Assembly assembly = Assembly.ReflectionOnlyLoadFrom(fName);
+                    foreach (Type type in assembly.GetExportedTypes())
+                    {
+                        Log.Append(type.FullName);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Append("打开程序集失败 {0}", ex.ToString());
+                    return;
+                }
+                finally
+                {
+                    AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.ResolveAssembly;
+                }
+
+            }
+        }
+
+        private void MenuItemLoadInstance_Click(object sender, EventArgs e)
+        {
+            reflactor_.Root.SerializeFrom(@"d:\test.xml");
+            reflactor_.Root.DispatchInstanceValue();
+
         }
     }
 

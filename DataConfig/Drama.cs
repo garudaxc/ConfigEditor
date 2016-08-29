@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,16 +58,17 @@ namespace DataConfig
         }
 
         int id;
-        UInt32 vv;
+        [OptionalField]
+        UInt32 vv2;
         string str;
         Reward[] reward;
 
         public void WriteLine()
         {
-            Console.WriteLine(id);
-            Console.WriteLine(vv);
-            Console.WriteLine(str);
-            Console.WriteLine(reward);
+            //Console.WriteLine(id);
+            //Console.WriteLine(vv);
+            //Console.WriteLine(str);
+            //Console.WriteLine(reward);
         }
     }
 
