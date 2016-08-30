@@ -32,6 +32,8 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemLoadAssembly = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemLoadInstance = new System.Windows.Forms.ToolStripMenuItem();
             this.treeView = new System.Windows.Forms.TreeView();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -41,8 +43,7 @@
             this.btnEdit = new System.Windows.Forms.Button();
             this.lableInfo = new System.Windows.Forms.Label();
             this.console = new System.Windows.Forms.RichTextBox();
-            this.MenuItemLoadAssembly = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuItemLoadInstance = new System.Windows.Forms.ToolStripMenuItem();
+            this.labelComment = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -80,16 +81,30 @@
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.newToolStripMenuItem.Text = "New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
+            // MenuItemLoadAssembly
+            // 
+            this.MenuItemLoadAssembly.Name = "MenuItemLoadAssembly";
+            this.MenuItemLoadAssembly.Size = new System.Drawing.Size(148, 22);
+            this.MenuItemLoadAssembly.Text = "加载程序集";
+            this.MenuItemLoadAssembly.Click += new System.EventHandler(this.MenuItemLoadAssembly_Click);
+            // 
+            // MenuItemLoadInstance
+            // 
+            this.MenuItemLoadInstance.Name = "MenuItemLoadInstance";
+            this.MenuItemLoadInstance.Size = new System.Drawing.Size(148, 22);
+            this.MenuItemLoadInstance.Text = "加载实例数据";
+            this.MenuItemLoadInstance.Click += new System.EventHandler(this.MenuItemLoadInstance_Click);
             // 
             // treeView
             // 
@@ -146,6 +161,7 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.labelComment);
             this.splitContainer2.Panel2.Controls.Add(this.btnAddElem);
             this.splitContainer2.Panel2.Controls.Add(this.btnEdit);
             this.splitContainer2.Panel2.Controls.Add(this.lableInfo);
@@ -191,7 +207,7 @@
             // 
             this.lableInfo.AutoSize = true;
             this.lableInfo.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lableInfo.Location = new System.Drawing.Point(19, 35);
+            this.lableInfo.Location = new System.Drawing.Point(19, 45);
             this.lableInfo.Name = "lableInfo";
             this.lableInfo.Size = new System.Drawing.Size(70, 14);
             this.lableInfo.TabIndex = 0;
@@ -206,19 +222,14 @@
             this.console.TabIndex = 0;
             this.console.Text = "";
             // 
-            // MenuItemLoadAssembly
+            // labelComment
             // 
-            this.MenuItemLoadAssembly.Name = "MenuItemLoadAssembly";
-            this.MenuItemLoadAssembly.Size = new System.Drawing.Size(152, 22);
-            this.MenuItemLoadAssembly.Text = "加载程序集";
-            this.MenuItemLoadAssembly.Click += new System.EventHandler(this.MenuItemLoadAssembly_Click);
-            // 
-            // MenuItemLoadInstance
-            // 
-            this.MenuItemLoadInstance.Name = "MenuItemLoadInstance";
-            this.MenuItemLoadInstance.Size = new System.Drawing.Size(152, 22);
-            this.MenuItemLoadInstance.Text = "加载实例数据";
-            this.MenuItemLoadInstance.Click += new System.EventHandler(this.MenuItemLoadInstance_Click);
+            this.labelComment.AutoSize = true;
+            this.labelComment.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelComment.Location = new System.Drawing.Point(19, 11);
+            this.labelComment.Name = "labelComment";
+            this.labelComment.Size = new System.Drawing.Size(0, 14);
+            this.labelComment.TabIndex = 3;
             // 
             // MainForm
             // 
@@ -266,6 +277,7 @@
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem MenuItemLoadAssembly;
         private System.Windows.Forms.ToolStripMenuItem MenuItemLoadInstance;
+        private System.Windows.Forms.Label labelComment;
     }
 }
 

@@ -35,6 +35,7 @@ namespace ConfigEditor
 
         static void AddTreeNode(TreeNode tn, FieldNode fd)
         {
+            tn.Nodes.Clear();
             tn.Tag = fd;
             if(fd.Type.IsArray) {
                 return;
@@ -49,21 +50,59 @@ namespace ConfigEditor
         {
             Log.Pipe = this.console;
 
-            //Type type = typeof(Gift);
+            Type type = typeof(Gift);
+            ConfigDataAttribute attri = type.GetCustomAttribute<ConfigDataAttribute>();
+            if(attri != null)
+            {
+                labelComment.Text = attri.Comment;
+            }
 
             reflactor_ = new TypeReflactor(typeof(Gift));
 
             RefreshTreeView();
 
-            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill ;
-            
-            Assembly assembly = Assembly.LoadFrom(@"D:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll");                    
+            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill ;            
+            //Assembly assembly = Assembly.LoadFrom(@"D:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll");
+        }
 
+        private DataGridViewCell CreateGridViewCell(FieldNode node)
+        {
+            DataGridViewCell cell;
+            if (node.Type.IsEnum)
+            {
+                DataGridViewComboBoxCell combo = new DataGridViewComboBoxCell();
+                combo.DataSource = node.Type.GetEnumNames();
+                cell = combo;
+
+                cell.Value = Enum.GetName(node.Type, node.Value);
+
+                Log.Append("value type " + combo.ValueType.Name);
+            }
+            else 
+            if (node.Type == typeof(Boolean))
+            {
+                cell = new DataGridViewCheckBoxCell();
+                cell.Value = node.Value;
+            }
+            else
+            {
+                cell = new DataGridViewTextBoxCell();
+                cell.Value = (node.Value == null) ? "null" : node.Value;
+            }
+
+            cell.Tag = node;
+            return cell;
         }
 
 
         private void FreshDataGrid(FieldNode field)
         {
+            dataGrid.Columns.Clear();
+            if (field == null)
+            {
+                return;
+            }
+
             if(field.Type.IsArray)
             {
                 Type elemType = field.Type.GetElementType();
@@ -97,8 +136,9 @@ namespace ConfigEditor
             }
             else
             {
-                dataGrid.Columns.Add("Name", "Name");
-                dataGrid.Columns.Add("Value", "Value");
+                dataGrid.Columns.Add("Name", "名称");
+                dataGrid.Columns.Add("Value", "值");
+                dataGrid.Columns.Add("Type", "类型");
                 dataGrid.RowHeadersVisible = false;
                 for (int i = 0; i < field.Children.Count; i++)
                 {
@@ -110,20 +150,32 @@ namespace ConfigEditor
                     cell.Value = node.Name;
                     cell.ReadOnly = true;
 
-                    cell = new DataGridViewTextBoxCell();
+                    cell = CreateGridViewCell(node);
                     row.Cells.Add(cell);
-                    cell.Value = node.Value == null ? "null" : node.Value;
-                    cell.Tag = node;
-                    if(!node.Type.IsValueType && !node.Type.Equals(typeof(string)))
+                    if (!node.Type.IsValueType && !node.Type.Equals(typeof(string)))
                     {
                         cell.ReadOnly = true;
                     }
 
-                    dataGrid.Rows.Add(row);
+                    cell = new DataGridViewTextBoxCell();
+                    row.Cells.Add(cell);
+                    string v = string.Empty;
+                    if(node.Type.IsClass && node.Type != typeof(string))
+                    {
+                        v += "类:";
+                    }
+                    if (node.Type.IsEnum)
+                    {
+                        v += "枚举:";
+                    }
+                    cell.Value = v + node.Type.Name;
+                    cell.ReadOnly = true;
 
+                    dataGrid.Rows.Add(row);
                 }
             }
 
+            treeView.Focus();
         }
 
         private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -131,8 +183,7 @@ namespace ConfigEditor
             FieldNode field = (FieldNode)e.Node.Tag;
 
             this.lableInfo.Text = field.Type.FullName;
-
-            dataGrid.Columns.Clear();
+            btnEdit.Tag = e.Node;
 
             if(field.Type.IsValueType || field.Type.Equals(typeof(string)))
             {
@@ -145,41 +196,58 @@ namespace ConfigEditor
             {
                 btnEdit.Text = "Construct";
                 btnEdit.Enabled = true;
-                btnEdit.Tag = field;
             }
             else
             {
                 btnEdit.Text = "Destroy";
                 btnEdit.Enabled = true;
-                btnEdit.Tag = field;
-
-                FreshDataGrid(field);
             }
 
+            if(field.Type.IsArray && field.Value != null)
+            {
+                btnAddElem.Enabled = true;
+            }
+            else
+            {
+                btnAddElem.Enabled = false;
+            }
+
+            FreshDataGrid(field);
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            FieldNode node = (FieldNode)btnEdit.Tag;
-            if (node.Value == null)
+            TreeNode tn = (TreeNode)btnEdit.Tag;
+            FieldNode fn = (FieldNode)tn.Tag;
+
+            if (fn.Value == null)
             {
-                node.ConstructValue();
+                fn.ConstructValue();
             }
             else
             {
-                node.DestroyValue();
+                fn.DestroyValue();
             }
 
-            RefreshTreeView();
+            AddTreeNode(tn, fn);
+            tn.ExpandAll();
+            treeView.SelectedNode = null;
+            treeView.SelectedNode = tn;
         }
 
         private void btnAddElem_Click(object sender, EventArgs e)
         {
-            FieldNode node = (FieldNode)btnEdit.Tag;
-            if (node.Value != null)
+            TreeNode tn = (TreeNode)btnEdit.Tag;
+            FieldNode fn = (FieldNode)tn.Tag;
+
+            if (fn.Value != null)
             {
-                node.CreateArrayElement();
-                RefreshTreeView();
+                fn.CreateArrayElement();
+
+                AddTreeNode(tn, fn);
+                tn.ExpandAll();
+                treeView.SelectedNode = null;
+                treeView.SelectedNode = tn;
             }
         }
 
@@ -190,10 +258,20 @@ namespace ConfigEditor
                                Cells[e.ColumnIndex];
 
             FieldNode node = (FieldNode)cell.Tag;
-            if(node.Type.IsValueType)
+
+            if (node.Type == typeof(bool) ||
+                node.Type == typeof(string))
+            {
+                node.Value = cell.Value;
+            }
+            else if (node.Type.IsEnum)
+            {
+                node.Value = Enum.Parse(node.Type, (string)cell.Value);
+            }
+            else if (node.Type.IsValueType)
             {
                 MethodInfo method = node.Type.GetMethod("Parse", new Type[] { typeof(string) });
-                if(method == null)
+                if (method == null)
                 {
                     Log.Append("can not find method TryParse in value type {0}", node.Type.Name);
                 }
@@ -201,7 +279,7 @@ namespace ConfigEditor
                 {
                     try
                     {
-                    	node.Value = method.Invoke(null, new Object[] { cell.Value });
+                        node.Value = method.Invoke(null, new Object[] { cell.Value });
                     }
                     catch (System.Exception ex)
                     {
@@ -212,11 +290,6 @@ namespace ConfigEditor
                         cell.Value = node.Value.ToString();
                     }
                 }
-            }
-
-            if(node.Type.Equals(typeof(string)))
-            {
-                node.Value = cell.Value;
             }
         }
 
@@ -255,19 +328,24 @@ namespace ConfigEditor
                 try
                 {
                     Assembly assembly = Assembly.LoadFrom(fName);
+                    Type attri = assembly.GetType("ConfigDataAttribute");
+
                     foreach (Type type in assembly.GetExportedTypes())
                     {
-                        Log.Append(type.FullName);
+                        if (type.IsDefined(attri, false))
+                        {
+                            Log.Append(type.FullName);
+                            
+                            reflactor_ = new TypeReflactor(type);
+                            RefreshTreeView();
+                            break;
+                        }
                     }
                 }
                 catch (System.Exception ex)
                 {
                     Log.Append("打开程序集失败 {0}", ex.ToString());
                     return;
-                }
-                finally
-                {
-                    //AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= this.ResolveAssembly;
                 }
 
             }

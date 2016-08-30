@@ -82,51 +82,7 @@ namespace ConfigEditor
 
             value_ = info_.GetValue(parent);
         }
-
-        static Object CreateValue(Type t, FieldInfo info)
-        {
-            // todo use info to init value
-            // enum ?
-
-            if (t.Equals(typeof(Int32)))
-            {
-                return new Int32();
-            }
-            else if (t.Equals(typeof(Int16)))
-            {
-                return new Int16();
-            }
-            else if (t.Equals(typeof(Byte)))
-            {
-                return new Byte();
-            }
-            else if (t.Equals(typeof(UInt32)))
-            {
-                return new UInt32();
-            }
-            else if (t.Equals(typeof(UInt16)))
-            {
-                return new UInt16();
-            }
-            else if (t.Equals(typeof(Single)))
-            {
-                return new Single();
-            }
-            else if (t.Equals(typeof(Double)))
-            {
-                return new Double();
-            }
-            else if (t.Equals(typeof(Boolean)))
-            {
-                return new Boolean();
-            }
-
-            // throw a exception
-            throw new Exception(string.Format("unknow value type {0}", t.Name));
-
-            return null;
-        }
-
+        
         public FieldNode(Type t, FieldInfo info = null)
         {
             type_ = t;
@@ -140,16 +96,13 @@ namespace ConfigEditor
 
             if(type_.IsValueType)
             {
-                value_ = CreateValue(t, info);
-                return;
+                value_ = Activator.CreateInstance(type_);
             }
 
-            if(type_.Equals(typeof(string)))
+            if (type_ == typeof(string))
             {
                 value_ = string.Empty;
-                return;
             }
-
         }
 
         public void ConstructValue()
@@ -170,25 +123,7 @@ namespace ConfigEditor
                 return;
             }
 
-            ConstructorInfo ct = type_.GetConstructor(Type.EmptyTypes);
-            if (ct == null)
-            {
-                Log.Append("can not find none params constructor of type : {0}", type_.Name);
-            }
-            else
-            {
-                Object[] parameters = new Object[0];
-                try
-                {
-                    value_ = ct.Invoke(parameters);
-                    Log.Append("construct a {0} object", value_.ToString());
-
-                }
-                catch (System.Exception ex)
-                {
-                    Log.Append("error in invoke constructor of type {0} : {1}", type_.Name, ex.ToString());
-                }
-            }
+            value_ = Activator.CreateInstance(type_);
 
             FieldInfo[] fields = type_.GetFields(BindingFlags.NonPublic |
                BindingFlags.Public |
@@ -198,6 +133,9 @@ namespace ConfigEditor
             {
                 children_.Add(new FieldNode(fields[i].FieldType, fields[i]));
             }
+
+            // init value
+            DispatchInstanceValue();
         }
 
         public void DestroyValue()
