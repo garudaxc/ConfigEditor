@@ -357,6 +357,13 @@ namespace ConfigEditor
             reflactor_.Root.DispatchInstanceValue();
 
         }
+
+        private void ToolStripMenuItemConfig_Click(object sender, EventArgs e)
+        {
+            FormConfig form = new FormConfig();
+            DialogResult result = form.ShowDialog();
+
+        }
     }
 
     class Log

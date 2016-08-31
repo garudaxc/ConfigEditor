@@ -39,11 +39,12 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.dataGrid = new System.Windows.Forms.DataGridView();
+            this.labelComment = new System.Windows.Forms.Label();
             this.btnAddElem = new System.Windows.Forms.Button();
             this.btnEdit = new System.Windows.Forms.Button();
             this.lableInfo = new System.Windows.Forms.Label();
             this.console = new System.Windows.Forms.RichTextBox();
-            this.labelComment = new System.Windows.Forms.Label();
+            this.ToolStripMenuItemConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -60,7 +61,8 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem1});
+            this.toolStripMenuItem1,
+            this.ToolStripMenuItemConfig});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(956, 25);
@@ -183,6 +185,15 @@
             this.dataGrid.TabIndex = 0;
             this.dataGrid.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGrid_CellEndEdit);
             // 
+            // labelComment
+            // 
+            this.labelComment.AutoSize = true;
+            this.labelComment.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.labelComment.Location = new System.Drawing.Point(19, 11);
+            this.labelComment.Name = "labelComment";
+            this.labelComment.Size = new System.Drawing.Size(0, 14);
+            this.labelComment.TabIndex = 3;
+            // 
             // btnAddElem
             // 
             this.btnAddElem.Location = new System.Drawing.Point(22, 132);
@@ -222,14 +233,12 @@
             this.console.TabIndex = 0;
             this.console.Text = "";
             // 
-            // labelComment
+            // ToolStripMenuItemConfig
             // 
-            this.labelComment.AutoSize = true;
-            this.labelComment.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.labelComment.Location = new System.Drawing.Point(19, 11);
-            this.labelComment.Name = "labelComment";
-            this.labelComment.Size = new System.Drawing.Size(0, 14);
-            this.labelComment.TabIndex = 3;
+            this.ToolStripMenuItemConfig.Name = "ToolStripMenuItemConfig";
+            this.ToolStripMenuItemConfig.Size = new System.Drawing.Size(44, 21);
+            this.ToolStripMenuItemConfig.Text = "设置";
+            this.ToolStripMenuItemConfig.Click += new System.EventHandler(this.ToolStripMenuItemConfig_Click);
             // 
             // MainForm
             // 
@@ -278,6 +287,7 @@
         private System.Windows.Forms.ToolStripMenuItem MenuItemLoadAssembly;
         private System.Windows.Forms.ToolStripMenuItem MenuItemLoadInstance;
         private System.Windows.Forms.Label labelComment;
+        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItemConfig;
     }
 }
 
