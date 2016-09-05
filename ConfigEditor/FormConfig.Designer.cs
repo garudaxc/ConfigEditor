@@ -72,6 +72,17 @@
             buttonAddAssembly.UseVisualStyleBackColor = true;
             buttonAddAssembly.Click += new System.EventHandler(this.buttonAddAssembly_Click);
             // 
+            // buttonAddPath
+            // 
+            buttonAddPath.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            buttonAddPath.Location = new System.Drawing.Point(453, 189);
+            buttonAddPath.Name = "buttonAddPath";
+            buttonAddPath.Size = new System.Drawing.Size(40, 35);
+            buttonAddPath.TabIndex = 7;
+            buttonAddPath.Text = "Add";
+            buttonAddPath.UseVisualStyleBackColor = true;
+            buttonAddPath.Click += new System.EventHandler(this.buttonAddPath_Click);
+            // 
             // listBoxAssembly
             // 
             this.listBoxAssembly.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -98,6 +109,7 @@
             // 
             // buttonOK
             // 
+            this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.buttonOK.Location = new System.Drawing.Point(172, 307);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(144, 37);
@@ -126,17 +138,6 @@
             this.buttonDelPath.Text = "Del";
             this.buttonDelPath.UseVisualStyleBackColor = true;
             this.buttonDelPath.Click += new System.EventHandler(this.buttonDelPath_Click);
-            // 
-            // buttonAddPath
-            // 
-            buttonAddPath.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            buttonAddPath.Location = new System.Drawing.Point(453, 189);
-            buttonAddPath.Name = "buttonAddPath";
-            buttonAddPath.Size = new System.Drawing.Size(40, 35);
-            buttonAddPath.TabIndex = 7;
-            buttonAddPath.Text = "Add";
-            buttonAddPath.UseVisualStyleBackColor = true;
-            buttonAddPath.Click += new System.EventHandler(this.buttonAddPath_Click);
             // 
             // FormConfig
             // 

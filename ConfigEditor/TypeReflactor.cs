@@ -87,13 +87,7 @@ namespace ConfigEditor
         {
             type_ = t;
             info_ = info;
-
-            //if (info_ != null)
-            //{
-            //    Log.Append("field {0} is {1}a value type", info_.Name, type_.IsValueType ? "" : "not ");
-            //    Log.Append("field {0} is {1}a array", info_.Name, type_.IsArray ? "" : "not ");
-            //}
-
+            
             if(type_.IsValueType)
             {
                 value_ = Activator.CreateInstance(type_);
@@ -125,13 +119,16 @@ namespace ConfigEditor
 
             value_ = Activator.CreateInstance(type_);
 
-            FieldInfo[] fields = type_.GetFields(BindingFlags.NonPublic |
-               BindingFlags.Public |
-               BindingFlags.Instance);
-
-            for (int i = 0; i < fields.Length; i++)
+            if (!type_.IsValueType && type_ != typeof(string))
             {
-                children_.Add(new FieldNode(fields[i].FieldType, fields[i]));
+                FieldInfo[] fields = type_.GetFields(BindingFlags.NonPublic |
+                   BindingFlags.Public |
+                   BindingFlags.Instance);
+
+                for (int i = 0; i < fields.Length; i++)
+                {
+                    children_.Add(new FieldNode(fields[i].FieldType, fields[i]));
+                }
             }
 
             // init value
@@ -206,27 +203,99 @@ namespace ConfigEditor
             children_.ForEach(node => node.DispatchInstanceValue());
         }
 
+        public void DispatchValue()
+        {
+            if (type_ == null || value_ == null)
+            {
+                return;
+            }
+            
+            if (type_.IsArray)
+            {
+                children_.Clear();
+                Array array = value_ as Array;
+                for (int i = 0; i < array.Length; i++)
+                {
+                    FieldNode child = CreateArrayElement();
+                    child.Value = array.GetValue(i);
+                }
+            }
+            else if (!type_.IsValueType && type_ != typeof(string))
+            {
+                FieldInfo[] fields = type_.GetFields(BindingFlags.NonPublic |
+                   BindingFlags.Public |
+                   BindingFlags.Instance);
+
+                for (int i = 0; i < fields.Length; i++)
+                {
+                    FieldNode node = new FieldNode(fields[i].FieldType, fields[i]);
+                    node.SetFieldValue(value_);
+                    children_.Add(node);
+                }
+            }
+
+            children_.ForEach(node => node.DispatchValue());
+        }
+
         public void SerializeTo(string path)
         {
             //BinaryFormatter serializer = new BinaryFormatter();
             //DataContractJsonSerializer 
+            FileStream stream = new FileStream(path, FileMode.Create);
+
+            string name = type_.FullName;
+
+            byte[] data = System.Text.Encoding.UTF8.GetBytes(name);
+            byte[] head = BitConverter.GetBytes(data.Length);
+            stream.Write(head, 0, head.Length);
+            stream.Write(data, 0, data.Length);
 
             DataContractSerializer serializer = new DataContractSerializer(type_);
-            FileStream stream = new FileStream(path, FileMode.Create);
+            
             //serializer.Serialize(stream, value_);
+
+
             serializer.WriteObject(stream, value_);
 
             stream.Close();
         }
 
-        public void SerializeFrom(string path)
+        public static FieldNode SerializeFrom(string path)
         {
-            DataContractSerializer serializer = new DataContractSerializer(type_);
             FileStream stream = new FileStream(path, FileMode.Open);
             //serializer.Serialize(stream, value_);
-            value_ = serializer.ReadObject(stream);
+
+            byte[] buffer = new byte[256];
+            stream.Read(buffer, 0, 4);
+            int len = BitConverter.ToInt32(buffer, 0);
+            stream.Read(buffer, 0, len);
+
+            string typeName = System.Text.Encoding.UTF8.GetString(buffer, 0, len);
+
+            Log.Append("read type {0}", typeName);
+            Type type = null;
+            foreach (LoadedAssembly ass in MainForm.Assemblys)
+            {
+                type = ass.assembly.GetType(typeName);
+                if (type != null)
+                {
+                    break;
+                }
+            }
+
+            if (type == null)
+            {
+                throw new Exception(string.Format("can not get type {0}", typeName));
+            }
+
+            DataContractSerializer serializer = new DataContractSerializer(type);
+            Object value = serializer.ReadObject(stream);
 
             stream.Close();
+
+            FieldNode node = new FieldNode(type);
+            node.Value = value;
+            return node;
         }
     }
 

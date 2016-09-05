@@ -7,26 +7,98 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using DataConfig;
 using System.Reflection;
 using System.Collections;
+using ConfigableData;
+using System.IO;
 
 namespace ConfigEditor
 {
+    // 验证可序列化
+    // 初始化时自动添加unity路径
+
 
     public partial class MainForm : Form
     {
-        TypeReflactor reflactor_;
+        FieldNode root_;
+
+        public static List<LoadedAssembly> Assemblys = new List<LoadedAssembly>();
 
         public MainForm()
         {
             InitializeComponent();
         }
+        
+        private Assembly ResolveAssembly(object sender, ResolveEventArgs e)
+        {
+            Log.Append("resolve {0}", e.Name);
+            AssemblyName resName = new AssemblyName(e.Name);
+            foreach (string path in Properties.Settings.Default.DependPath)
+            {
+                string fullpath = string.Format("{0}\\{1}.dll", path, resName.Name);
+                if (File.Exists(fullpath))
+                {
+                    Log.Append("load {0}", fullpath);
+                    try
+                    {
+                        Assembly assembly = Assembly.LoadFrom(fullpath);
+                        return assembly;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Log.Append("找到{0}，但加载失败 {1}", fullpath, ex.ToString());
+                    }
+                }
+            }
+
+            return null ;
+        }
+
+        private void LoadClasses()
+        {
+            Assemblys.Clear();
+
+            AppDomain.CurrentDomain.AssemblyResolve += this.ResolveAssembly;
+            foreach (string fName in Properties.Settings.Default.AssemblyPath)
+            {
+                Assembly assembly;
+                LoadedAssembly loaded;
+                try
+                {
+                    assembly = Assembly.LoadFrom(fName);
+                    if (assembly == null)
+                    {
+                        Log.Append("assembly is null {0}", fName);
+                    }
+
+                    loaded = new LoadedAssembly();
+                    loaded.assembly = assembly;
+
+                    foreach (Type type in assembly.GetExportedTypes())
+                    {
+                        if (type.IsDefined(typeof(ConfigableData.ConfigDataAttribute), false))
+                        {
+                            loaded.LoadedTypes.Add(type);
+                            Log.Append(type.FullName);
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Append("加载程序集 {0} 失败：{1}", fName, ex.ToString());
+                    continue;
+                }
+
+                Assemblys.Add(loaded);
+            }
+
+            AppDomain.CurrentDomain.AssemblyResolve -= this.ResolveAssembly;
+        }
 
         private void RefreshTreeView()
         {
             treeView.Nodes.Clear();
-            FieldNode fn = reflactor_.Root;
+            FieldNode fn = root_;
             TreeNode root = treeView.Nodes.Add(fn.Name);
 
             AddTreeNode(root, fn);
@@ -50,19 +122,21 @@ namespace ConfigEditor
         {
             Log.Pipe = this.console;
 
-            Type type = typeof(Gift);
-            ConfigDataAttribute attri = type.GetCustomAttribute<ConfigDataAttribute>();
-            if(attri != null)
-            {
-                labelComment.Text = attri.Comment;
-            }
+            //Type type = typeof(Gift);
+            //ConfigDataAttribute attri = type.GetCustomAttribute<ConfigDataAttribute>();
+            //if(attri != null)
+            //{
+            //    labelComment.Text = attri.Comment;
+            //}
 
-            reflactor_ = new TypeReflactor(typeof(Gift));
+            foreach (string path in Properties.Settings.Default.DependPath)
+            { }
 
-            RefreshTreeView();
+            LoadClasses();
 
-            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill ;            
-            //Assembly assembly = Assembly.LoadFrom(@"D:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll");
+            //RefreshTreeView();
+
+            dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill ;
         }
 
         private DataGridViewCell CreateGridViewCell(FieldNode node)
@@ -125,9 +199,7 @@ namespace ConfigEditor
                     DataGridViewRow row = new DataGridViewRow();
 
                     node.Children.ForEach(n => {
-                        DataGridViewCell cell = new DataGridViewTextBoxCell();
-                        cell.Value = n.Value;
-                        cell.Tag = n;
+                        DataGridViewCell cell = CreateGridViewCell(n);
                         row.Cells.Add(cell);
                     });
 
@@ -295,74 +367,59 @@ namespace ConfigEditor
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            FormSelectType form = new FormSelectType();
+            if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                if (form.SelectedType != null)
+                {
+                    root_ = new FieldNode(form.SelectedType);
+                    root_.ConstructValue();
+                    RefreshTreeView();
+                }
+            }
+            form.Dispose();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            reflactor_.Root.CollectInstanceValue();
-            reflactor_.Root.SerializeTo(@"d:\test.xml");
+            if (root_ != null)
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "xml文件|*.xml|所有文件|*.*";
+                openFileDialog.RestoreDirectory = true;
+                openFileDialog.Multiselect = false;
+                openFileDialog.FilterIndex = 1;
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    root_.CollectInstanceValue();
+                    root_.SerializeTo(@"d:\test.xml");
+                }
+                openFileDialog.Dispose();
+            }
         }
-
-        private Assembly ResolveAssembly(object sender, ResolveEventArgs e)
+                
+        private void MenuItemLoadInstance_Click(object sender, EventArgs e)
         {
-            Log.Append("resolve {0}", e.Name);
-            Assembly ass = Assembly.ReflectionOnlyLoad(e.Name);
-            return ass;
-        }
-
-        private void MenuItemLoadAssembly_Click(object sender, EventArgs e)
-        {
-            
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            //openFileDialog.InitialDirectory = "c:\\";//注意这里写路径时要用c:\\而不是c:\
-            openFileDialog.Filter = "程序集|*.dll;*.exe|所有文件|*.*";
+            openFileDialog.Filter = "xml文件|*.xml|所有文件|*.*";
             openFileDialog.RestoreDirectory = true;
             openFileDialog.Multiselect = false;
             openFileDialog.FilterIndex = 1;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                string fName = openFileDialog.FileName;
-                // 预加载程序集？
-                //AppDomain.CurrentDomain.AssemblyResolve
-                //AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += this.ResolveAssembly;
-                try
-                {
-                    Assembly assembly = Assembly.LoadFrom(fName);
-                    Type attri = assembly.GetType("ConfigDataAttribute");
-
-                    foreach (Type type in assembly.GetExportedTypes())
-                    {
-                        if (type.IsDefined(attri, false))
-                        {
-                            Log.Append(type.FullName);
-                            
-                            reflactor_ = new TypeReflactor(type);
-                            RefreshTreeView();
-                            break;
-                        }
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Log.Append("打开程序集失败 {0}", ex.ToString());
-                    return;
-                }
-
+                root_ = FieldNode.SerializeFrom(@"d:\test.xml");
+                root_.DispatchValue();
+                RefreshTreeView();
             }
-        }
 
-        private void MenuItemLoadInstance_Click(object sender, EventArgs e)
-        {
-            reflactor_.Root.SerializeFrom(@"d:\test.xml");
-            reflactor_.Root.DispatchInstanceValue();
-
+            openFileDialog.Dispose();
         }
 
         private void ToolStripMenuItemConfig_Click(object sender, EventArgs e)
         {
             FormConfig form = new FormConfig();
             DialogResult result = form.ShowDialog();
-
+            LoadClasses();
         }
     }
 
@@ -394,6 +451,12 @@ namespace ConfigEditor
                 pipe_.Clear();
             }
         }
+    }
+    
+    public class LoadedAssembly
+    {
+        public Assembly assembly;
+        public List<Type> LoadedTypes = new List<Type>();
     }
 
 }

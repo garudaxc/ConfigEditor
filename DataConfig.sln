@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataConfig", "DataConfig\Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigEditor", "ConfigEditor\ConfigEditor.csproj", "{CA8F8202-1FFA-4A24-B9D6-F3AE5744086C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigableData", "ConfigableData\ConfigableData.csproj", "{8B3BC228-8C19-472D-AB41-883E7F75811C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{CA8F8202-1FFA-4A24-B9D6-F3AE5744086C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA8F8202-1FFA-4A24-B9D6-F3AE5744086C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA8F8202-1FFA-4A24-B9D6-F3AE5744086C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B3BC228-8C19-472D-AB41-883E7F75811C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B3BC228-8C19-472D-AB41-883E7F75811C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B3BC228-8C19-472D-AB41-883E7F75811C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B3BC228-8C19-472D-AB41-883E7F75811C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

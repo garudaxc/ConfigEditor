@@ -8,32 +8,19 @@ using System.Threading.Tasks;
 
 namespace DataConfig
 {
-    public class ConfigDataAttribute : System.Attribute
-    {
-        string comment_ = "";
-        public ConfigDataAttribute(string comment)
-        {
-            comment_ = comment;
-        }
 
-        public string Comment
-        {
-            get
-            {
-                return comment_;
-            }
-        }
-    }
 
-    [ConfigData("动画脚本")]
+    [ConfigableData.ConfigData("动画脚本")]
     [Serializable]
     public class Drama
     {
+        [Serializable]
         class Music
         {
             string name;
             float startTime;
         }
+        [Serializable]
         class PlayerAnimation
         {
             string name;
@@ -41,12 +28,14 @@ namespace DataConfig
             bool loop;
         }
 
+        [Serializable]
         class Player
         {
             string id;
             PlayerAnimation[] anims;
         }
 
+        [Serializable]
         class Dialogue
         {
             string speakerId;
@@ -58,6 +47,7 @@ namespace DataConfig
         Player leftPlayer;
         Player rightPlayer;
         Dialogue dialogue;
+        int aaa;
     }
 
     // 必须有无参的构造函数
@@ -71,7 +61,7 @@ namespace DataConfig
     }
 
 
-    [ConfigData("奖励")]
+    [ConfigableData.ConfigData("奖励")]
     [Serializable]
     public class Gift
     {
@@ -122,6 +112,6 @@ namespace DataConfig
         }
     }
 
-    
+
 
 }

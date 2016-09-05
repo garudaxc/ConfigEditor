@@ -32,8 +32,8 @@
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuItemLoadAssembly = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemLoadInstance = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolStripMenuItemConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.treeView = new System.Windows.Forms.TreeView();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -44,7 +44,6 @@
             this.btnEdit = new System.Windows.Forms.Button();
             this.lableInfo = new System.Windows.Forms.Label();
             this.console = new System.Windows.Forms.RichTextBox();
-            this.ToolStripMenuItemConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -74,7 +73,6 @@
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newToolStripMenuItem,
             this.saveToolStripMenuItem,
-            this.MenuItemLoadAssembly,
             this.MenuItemLoadInstance});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(39, 21);
@@ -94,19 +92,19 @@
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
-            // MenuItemLoadAssembly
-            // 
-            this.MenuItemLoadAssembly.Name = "MenuItemLoadAssembly";
-            this.MenuItemLoadAssembly.Size = new System.Drawing.Size(148, 22);
-            this.MenuItemLoadAssembly.Text = "加载程序集";
-            this.MenuItemLoadAssembly.Click += new System.EventHandler(this.MenuItemLoadAssembly_Click);
-            // 
             // MenuItemLoadInstance
             // 
             this.MenuItemLoadInstance.Name = "MenuItemLoadInstance";
             this.MenuItemLoadInstance.Size = new System.Drawing.Size(148, 22);
             this.MenuItemLoadInstance.Text = "加载实例数据";
             this.MenuItemLoadInstance.Click += new System.EventHandler(this.MenuItemLoadInstance_Click);
+            // 
+            // ToolStripMenuItemConfig
+            // 
+            this.ToolStripMenuItemConfig.Name = "ToolStripMenuItemConfig";
+            this.ToolStripMenuItemConfig.Size = new System.Drawing.Size(44, 21);
+            this.ToolStripMenuItemConfig.Text = "设置";
+            this.ToolStripMenuItemConfig.Click += new System.EventHandler(this.ToolStripMenuItemConfig_Click);
             // 
             // treeView
             // 
@@ -174,6 +172,7 @@
             // dataGrid
             // 
             this.dataGrid.AllowUserToResizeRows = false;
+            this.dataGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.dataGrid.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGrid.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -233,13 +232,6 @@
             this.console.TabIndex = 0;
             this.console.Text = "";
             // 
-            // ToolStripMenuItemConfig
-            // 
-            this.ToolStripMenuItemConfig.Name = "ToolStripMenuItemConfig";
-            this.ToolStripMenuItemConfig.Size = new System.Drawing.Size(44, 21);
-            this.ToolStripMenuItemConfig.Text = "设置";
-            this.ToolStripMenuItemConfig.Click += new System.EventHandler(this.ToolStripMenuItemConfig_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -284,7 +276,6 @@
         private System.Windows.Forms.Button btnEdit;
         private System.Windows.Forms.Button btnAddElem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem MenuItemLoadAssembly;
         private System.Windows.Forms.ToolStripMenuItem MenuItemLoadInstance;
         private System.Windows.Forms.Label labelComment;
         private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItemConfig;

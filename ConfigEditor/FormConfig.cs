@@ -37,13 +37,15 @@ namespace ConfigEditor
                 this.listBoxAssembly.DataSource = Properties.Settings.Default.AssemblyPath;
                 Properties.Settings.Default.Save();
             }
+            openFileDialog.Dispose();
         }
 
         private void buttonDelAssebly_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.AssemblyPath.RemoveAt(listBoxAssembly.SelectedIndex);
-            this.listBoxAssembly.DataSource = null;            
+            this.listBoxAssembly.DataSource = null;
             this.listBoxAssembly.DataSource = Properties.Settings.Default.AssemblyPath;
+            Properties.Settings.Default.Save();
         }
 
         private void buttonAddPath_Click(object sender, EventArgs e)
@@ -58,6 +60,7 @@ namespace ConfigEditor
                 this.listBoxDependPath.DataSource = Properties.Settings.Default.DependPath;
                 Properties.Settings.Default.Save();
             }
+            folderDlg.Dispose();
         }
 
         private void buttonDelPath_Click(object sender, EventArgs e)
@@ -65,6 +68,7 @@ namespace ConfigEditor
             Properties.Settings.Default.DependPath.RemoveAt(listBoxDependPath.SelectedIndex);
             this.listBoxDependPath.DataSource = null;
             this.listBoxDependPath.DataSource = Properties.Settings.Default.DependPath;
+            Properties.Settings.Default.Save();
         }
 
         private void listBox_SelectedIndexChanged(object sender, EventArgs e)
