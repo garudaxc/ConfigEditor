@@ -16,6 +16,7 @@ namespace ConfigEditor
 {
     // 验证可序列化
     // 初始化时自动添加unity路径
+    // 泛型list支持
     
     public partial class MainForm : Form
     {
@@ -198,7 +199,7 @@ namespace ConfigEditor
             return column;
         }
 
-        private void FreshDataGrid(FieldNode field)
+        private void RefreshDataGrid(FieldNode field)
         {
             dataGrid.Columns.Clear();
             if (field == null)
@@ -274,6 +275,7 @@ namespace ConfigEditor
                 dataGrid.Columns.Add("Name", "名称");
                 dataGrid.Columns.Add("Value", "值");
                 dataGrid.Columns.Add("Type", "类型");
+                dataGrid.Columns.Add("Comment", "");
                 dataGrid.RowHeadersVisible = false;
                 for (int i = 0; i < field.Children.Count; i++)
                 {
@@ -306,6 +308,10 @@ namespace ConfigEditor
                     cell.Value = v + node.Type.Name;
                     cell.ReadOnly = true;
 
+                    cell = new DataGridViewTextBoxCell();
+                    cell.Value = node.Comment;
+                    row.Cells.Add(cell);
+
                     dataGrid.Rows.Add(row);
                 }
             }
@@ -317,42 +323,42 @@ namespace ConfigEditor
         {
             FieldNode field = (FieldNode)e.Node.Tag;
 
-            this.lableInfo.Text = field.Type.FullName;
-            btnEdit.Tag = e.Node;
+            //this.lableInfo.Text = field.Type.FullName;
+            toolStripButtonCreate.Tag = e.Node;
 
             if(field.Type.IsValueType || field.Type.Equals(typeof(string)))
             {
-                btnEdit.Enabled = false;
-                btnEdit.Tag = null;
+                toolStripButtonCreate.Enabled = false;
+                toolStripButtonCreate.Tag = null;
                 return;
             }
 
             if(field.Value == null)
             {
-                btnEdit.Text = "Construct";
-                btnEdit.Enabled = true;
+                toolStripButtonCreate.Text = "Construct";
+                toolStripButtonCreate.Enabled = true;
             }
             else
             {
-                btnEdit.Text = "Destroy";
-                btnEdit.Enabled = true;
+                toolStripButtonCreate.Text = "Destroy";
+                toolStripButtonCreate.Enabled = true;
             }
 
             if(field.Type.IsArray && field.Value != null)
             {
-                btnAddElem.Enabled = true;
+                this.toolStripButtonAddElem.Enabled = true;
             }
             else
             {
-                btnAddElem.Enabled = false;
+                toolStripButtonAddElem.Enabled = false;
             }
 
-            FreshDataGrid(field);
+            RefreshDataGrid(field);
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
         {
-            TreeNode tn = (TreeNode)btnEdit.Tag;
+            TreeNode tn = (TreeNode)this.toolStripButtonCreate.Tag;
             FieldNode fn = (FieldNode)tn.Tag;
 
             if (fn.Value == null)
@@ -372,7 +378,7 @@ namespace ConfigEditor
 
         private void btnAddElem_Click(object sender, EventArgs e)
         {
-            TreeNode tn = (TreeNode)btnEdit.Tag;
+            TreeNode tn = (TreeNode)toolStripButtonCreate.Tag;
             FieldNode fn = (FieldNode)tn.Tag;
 
             if (fn.Value != null)
@@ -471,7 +477,8 @@ namespace ConfigEditor
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 root_ = FieldNode.SerializeFrom(@"d:\test.xml");
-                root_.DispatchValue();
+                root_.DispatchField();
+                //root_.DispatchValue();
                 RefreshTreeView();
             }
 

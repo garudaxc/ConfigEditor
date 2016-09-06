@@ -132,6 +132,33 @@ namespace ConfigEditor
 
             value_ = Activator.CreateInstance(type_);
 
+            DispatchField();
+
+            //if (!type_.IsValueType && type_ != typeof(string))
+            //{
+            //    FieldInfo[] fields = type_.GetFields(BindingFlags.NonPublic |
+            //       BindingFlags.Public |
+            //       BindingFlags.Instance);
+
+            //    for (int i = 0; i < fields.Length; i++)
+            //    {
+            //        children_.Add(new FieldNode(fields[i].FieldType, fields[i]));
+            //    }
+            //}
+
+            //// init value
+            //DispatchInstanceValue();
+        }
+
+        public void DispatchField()
+        {
+            if (value_ == null)
+            {
+                return;
+            }
+
+            children_.Clear();
+            
             if (!type_.IsValueType && type_ != typeof(string))
             {
                 FieldInfo[] fields = type_.GetFields(BindingFlags.NonPublic |
@@ -140,13 +167,26 @@ namespace ConfigEditor
 
                 for (int i = 0; i < fields.Length; i++)
                 {
-                    children_.Add(new FieldNode(fields[i].FieldType, fields[i]));
+                    FieldNode child = new FieldNode(fields[i].FieldType, fields[i]);
+                    child.SetFieldValue(value_);
+                    child.DispatchField();
+                    children_.Add(child);
                 }
             }
 
-            // init value
-            DispatchInstanceValue();
+            if (type_.IsArray)
+            {
+                Array array = value_ as Array;
+                for (int i = 0; i < array.Length; i++)
+                {
+                    FieldNode child = new FieldNode(type_.GetElementType());
+                    child.Value = array.GetValue(i);
+                    child.DispatchField();
+                    children_.Add(child);
+                }
+            }
         }
+
 
         public void DestroyValue()
         {
