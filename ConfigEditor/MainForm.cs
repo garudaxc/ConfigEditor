@@ -16,8 +16,7 @@ namespace ConfigEditor
 {
     // 验证可序列化
     // 初始化时自动添加unity路径
-
-
+    
     public partial class MainForm : Form
     {
         FieldNode root_;
@@ -109,25 +108,22 @@ namespace ConfigEditor
         {
             tn.Nodes.Clear();
             tn.Tag = fd;
-            if(fd.Type.IsArray) {
-                return;
-            }
+            tn.ToolTipText = fd.Comment;
+            //if(fd.Type.IsArray) {
+            //    return;
+            //}
 
             fd.Children.ForEach(node => {
-                TreeNode newTn = tn.Nodes.Add(node.Name);
-                AddTreeNode(newTn, node);
+                if (!node.Type.IsValueType && node.Type != typeof(string))
+                {
+                    TreeNode newTn = tn.Nodes.Add(node.Name);
+                    AddTreeNode(newTn, node);
+                }
             });
         }
         private void MainForm_Load(object sender, EventArgs e)
         {
             Log.Pipe = this.console;
-
-            //Type type = typeof(Gift);
-            //ConfigDataAttribute attri = type.GetCustomAttribute<ConfigDataAttribute>();
-            //if(attri != null)
-            //{
-            //    labelComment.Text = attri.Comment;
-            //}
 
             foreach (string path in Properties.Settings.Default.DependPath)
             { }
@@ -139,12 +135,13 @@ namespace ConfigEditor
             dataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill ;
         }
 
-        private DataGridViewCell CreateGridViewCell(FieldNode node)
+        private DataGridViewCell CreateGridViewCell(FieldNode node, DataGridViewCellCollection cells)
         {
             DataGridViewCell cell;
             if (node.Type.IsEnum)
             {
                 DataGridViewComboBoxCell combo = new DataGridViewComboBoxCell();
+                cells.Add(combo);
                 combo.DataSource = node.Type.GetEnumNames();
                 cell = combo;
 
@@ -152,15 +149,16 @@ namespace ConfigEditor
 
                 Log.Append("value type " + combo.ValueType.Name);
             }
-            else 
-            if (node.Type == typeof(Boolean))
+            else if (node.Type == typeof(Boolean))
             {
                 cell = new DataGridViewCheckBoxCell();
+                cells.Add(cell);
                 cell.Value = node.Value;
             }
             else
             {
                 cell = new DataGridViewTextBoxCell();
+                cells.Add(cell);
                 cell.Value = (node.Value == null) ? "null" : node.Value;
             }
 
@@ -168,6 +166,37 @@ namespace ConfigEditor
             return cell;
         }
 
+        private DataGridViewColumn CreateColumn(Type type)
+        {
+
+            DataGridViewColumn column;
+            if (type.IsEnum)
+            {
+                DataGridViewComboBoxColumn c = new DataGridViewComboBoxColumn();
+                c.DataSource = type.GetEnumNames();
+                column = c;
+                //DataGridViewComboBoxCell combo = new DataGridViewComboBoxCell();
+                //cells.Add(combo);
+                //combo.DataSource = node.Type.GetEnumNames();
+                //cell = combo;
+
+                //cell.Value = Enum.GetName(node.Type, node.Value);
+
+                //Log.Append("value type " + combo.ValueType.Name);
+            }
+            else if (type == typeof(Boolean))
+            {
+                DataGridViewCheckBoxColumn c = new DataGridViewCheckBoxColumn();
+                column = c;
+            }
+            else
+            {
+                DataGridViewTextBoxColumn c = new DataGridViewTextBoxColumn();
+                column = c;
+            }
+
+            return column;
+        }
 
         private void FreshDataGrid(FieldNode field)
         {
@@ -180,31 +209,65 @@ namespace ConfigEditor
             if(field.Type.IsArray)
             {
                 Type elemType = field.Type.GetElementType();
-
-                FieldInfo[] fields = elemType.GetFields(BindingFlags.NonPublic |
-                                                   BindingFlags.Public |
-                                                   BindingFlags.Instance);
-
-                for (int i = 0; i < fields.Length; i++)
+                
+                if (elemType.IsValueType || elemType == typeof(string))
                 {
-                    dataGrid.Columns.Add(fields[i].Name, fields[i].Name);
+                    dataGrid.Columns.Add(CreateColumn(elemType));
+                }
+                else
+                {
+                    FieldInfo[] fields = elemType.GetFields(BindingFlags.NonPublic |
+                                                       BindingFlags.Public |
+                                                       BindingFlags.Instance);
+
+                    for (int i = 0; i < fields.Length; i++)
+                    {
+                        DataGridViewColumn column = CreateColumn(fields[i].FieldType);
+                        column.HeaderText = fields[i].Name;
+                        column.ToolTipText = fields[i].Comment();
+                        dataGrid.Columns.Add(column);
+                    }
                 }
 
                 dataGrid.RowHeadersVisible = true;
 
-                for (int i = 0; i < field.Children.Count; i++)
+                if (field.Children.Count > 0)
                 {
-                    FieldNode node = field.Children[i];
+                    dataGrid.Rows.Add(field.Children.Count);
 
-                    DataGridViewRow row = new DataGridViewRow();
-
-                    node.Children.ForEach(n => {
-                        DataGridViewCell cell = CreateGridViewCell(n);
-                        row.Cells.Add(cell);
-                    });
-
-                    dataGrid.Rows.Add(row);
+                    for (int i = 0; i < field.Children.Count; i++)
+                    {
+                        FieldNode node = field.Children[i];
+                        for (int j = 0; j < node.Children.Count; j++)
+                        {
+                            FieldNode n = node.Children[j];
+                            dataGrid.Rows[i].Cells[j].Tag = n;
+                            if (node.Children[j].Type.IsEnum)
+                            {
+                                dataGrid.Rows[i].Cells[j].Value = Enum.GetName(n.Type, n.Value);
+                            }
+                            else
+                            {
+                                dataGrid.Rows[i].Cells[j].Value = n.Value;
+                            }
+                        }
+                    }
                 }
+
+
+                //for (int i = 0; i < field.Children.Count; i++)
+                //{
+                //    FieldNode node = field.Children[i];
+
+                //    DataGridViewRow row = new DataGridViewRow();
+
+                //    node.Children.ForEach(n => {
+                //        DataGridViewCell cell = CreateGridViewCell(n, row.Cells);
+                        
+                //        //row.Cells.Add(cell);
+                //    });
+                //    dataGrid.Rows.Add(row);
+                //}
             }
             else
             {
@@ -222,8 +285,8 @@ namespace ConfigEditor
                     cell.Value = node.Name;
                     cell.ReadOnly = true;
 
-                    cell = CreateGridViewCell(node);
-                    row.Cells.Add(cell);
+                    cell = CreateGridViewCell(node, row.Cells);
+                    //row.Cells.Add(cell);
                     if (!node.Type.IsValueType && !node.Type.Equals(typeof(string)))
                     {
                         cell.ReadOnly = true;

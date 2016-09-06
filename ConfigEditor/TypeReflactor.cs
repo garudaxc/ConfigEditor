@@ -63,6 +63,19 @@ namespace ConfigEditor
             }
         }
 
+        public string Comment
+        {
+            get
+            {
+                if (info_ != null)
+                {
+                    return info_.Comment();
+                }
+
+                return string.Empty;
+            }
+        }
+
         public void CollectFieldValue(Object parent)
         {
             if (info_ == null)
@@ -299,27 +312,18 @@ namespace ConfigEditor
         }
     }
 
-
-    class TypeReflactor
+    static class ExtentionMethod
     {
-        Type type_;
-        FieldNode root;
-
-        public FieldNode Root
+        public static string Comment(this FieldInfo info)
         {
-            get
+            ConfigableData.ConfigDataAttribute attri = info.GetCustomAttribute<ConfigableData.ConfigDataAttribute>();
+            if (attri != null)
             {
-                return root;
+                return attri.Comment;
             }
+
+            return string.Empty;
         }
 
-        public TypeReflactor(Type t)
-        {
-            type_ = t;
-
-            root = new FieldNode(type_);
-            root.ConstructValue();
-            return;                        
-        }
     }
 }
